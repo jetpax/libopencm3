@@ -466,12 +466,16 @@ void can_fifo_release(uint32_t canport, uint8_t fifo)
 @param[out] data Unsigned int8[]. Message payload data.
 @param[out] timestamp Pointer to store the message timestamp.
 			Only valid on time triggered CAN. Use NULL to ignore.
+@returns int 0-3 depending on how many messages where pending before
+                        releasing the FIFO.
+                        when 0 is returned no message could be retrieved
  */
-void can_receive(uint32_t canport, uint8_t fifo, bool release, uint32_t *id,
+uint32_t can_receive(uint32_t canport, uint8_t fifo, bool release, uint32_t *id,
 		 bool *ext, bool *rtr, uint8_t *fmi, uint8_t *length,
 		 uint8_t *data, uint16_t *timestamp)
 {
-	uint32_t fifo_id = 0;
+    uint32_t pending_cnt = can_fifo_pending(canport, fifo);
+ 	uint32_t fifo_id = 0;
 	union {
 		uint8_t data8[4];
 		uint32_t data32;
@@ -542,6 +546,7 @@ void can_receive(uint32_t canport, uint8_t fifo, bool release, uint32_t *id,
 	if (release) {
 		can_fifo_release(canport, fifo);
 	}
+    return pending_cnt;
 }
 
 bool can_available_mailbox(uint32_t canport)

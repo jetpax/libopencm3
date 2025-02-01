@@ -553,3 +553,19 @@ bool can_available_mailbox(uint32_t canport)
 {
 	return CAN_TSR(canport) & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2);
 }
+
+/*---------------------------------------------------------------------------*/
+/** @brief CAN get number of pending RX messages
+@param[in] canport Unsigned int32. CAN block register base @ref can_reg_base.
+@param[in] fifo Unsigned int8. FIFO id.
+@returns int 1, 2 or 3 if messages are pending in given fifo, 0 otherwise.
+ */
+uint32_t can_fifo_pending(uint32_t canport, uint8_t fifo)
+{
+	if (fifo == 0) {
+		return CAN_RF0R(canport) & CAN_RF0R_FMP0_MASK;
+	} else {
+		return CAN_RF1R(canport) & CAN_RF1R_FMP1_MASK;
+	}
+}
+
